@@ -46,7 +46,11 @@
             let log = await fetch("https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/log.json");
             let log_data = await log.json();
             if (log_data.date === is_update){
+                console.log("업데이트함");
                 return;
+            }else {
+                is_update = log_data.date;
+                medias = [];
             }
             while(true){
                 let temp_ok = false;
@@ -88,7 +92,6 @@
                 _index = 0;
                 count = 0;
                 if (navigator.onLine){
-                    medias = [];
                     load_medias();
                 }
             }
