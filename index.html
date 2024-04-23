@@ -5,18 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>mudn_did</title>
     <style>
-        body{
-            overflow: scroll;
+        html{
             scrollbar-width: none;
-            scroll-snap-type: y mandatory;
-            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            position: absolute;
             width: 100vw;
             object-fit: contain;
             display: grid;
             grid-template-columns: 1fr;
+            margin: 0;
+            padding: 0;
+            top: var(--slide-end);
+            transition: 0.5s;
         }
-        img video {
+        img, video {
             scroll-snap-align: start;
+            width: 100%;
+            height: 100vh;
         }
     </style>
 </head>
@@ -32,27 +40,33 @@
 
         let medias = [];
         let count = 0;
-        const load_medias = () => {
+        let is_update = "";
+        const SLIDE_TIME = 1000;
+        const load_medias = async () => {
+            let log = await fetch("https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/log.json");
+            let log_data = await log.json();
+            if (log_data.date === is_update){
+                return;
+            }
             while(true){
                 let temp_ok = false;
                 count += 1;
-                fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp`)
-                    .then(
-                        (res) => {temp_ok = res.ok}
-                    );
-                if (temp_ok){
+                let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp`);
+                temp_ok = res.ok;
+                if (res.ok){
                     medias.push({type: "img", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp`});
+                    continue;
                 } else {
-                    fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4`)
-                    .then(
-                        (res) => {temp_ok = res.ok}
-                    );
+                    let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4`);
+                    temp_ok = res.ok;
                 }
                 if (temp_ok){
                     medias.push({type: "video", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4`});
+                }else {
+                    break;
                 }
-
-                let inner_html = "";
+            }
+            let inner_html = "";
                 count = 0;
                 medias.forEach((m) => {
                     if (m.type === "img"){
@@ -61,48 +75,56 @@
                         count += 1;
                         inner_html += `<video class=\"video${count}\" muted> <source src=\"${m.link}\" type=\'video/mp4\' /> </video>`;
                     }
-                });
-            }
+            });
+            document.body.innerHTML = inner_html;
         }
+        load_medias();
         
         let is_video = false;
         let video_index = 0;
-        const sliding = (index) => {
-            if (medias.length === 0) setTimeout(sliding(0),1000);
+        const sliding = (_index) => {
+            if (_index === medias.length){
+                video_index = 0;
+                _index = 0;
+                count = 0;
+                if (navigator.onLine){
+                    medias = [];
+                    load_medias();
+                }
+            }
+            if (medias.length === 0) setTimeout(() => sliding(0),1000);
             else {
                 let body = document.body;
-                if (medias[index].type === "video"){
+                if (medias[_index].type === "video"){
                     video_index += 1;
-                    let video = document.querySelector(`.video${video_index}`).get(0);
+                    let video = document.querySelector(`.video${video_index}`);
                     video.pause();
                     video.currentTime = 0;
                     video.play();
                     const v_end = () => {
-                        if (video.prop("ended")){
-                            body.scrollTop += 100;
-                            if (body.offsetHeight + body.scrollTop >= body.scrollHeight){
-                                body.scrollTop = 0;
-                            }
-                            return sliding(index + 1);
-                        }else {
-                            return setTimeout(v_end(), 200);
-                        }
+                        let _video = video;
+                        
+                        body.style = `
+                            --slide-end: -${_index === medias.length - 1 ? 0 : _index * 100 + 100}vh;
+                        `;
+                        _video.removeEventListener("ended", v_end);
+                        sliding(_index + 1);
                     }
-                    return v_end();
+                    return video.addEventListener("ended",v_end);
                 }
                 else {
                     return setTimeout(
                         () => {
-                            body.scrollTop += 100;
-                            if (body.offsetHeight + body.scrollTop >= body.scrollHeight){
-                                body.scrollTop = 0;
-                            }
-                            return sliding(index + 1);
-                        }, 1000
+                            body.style = `
+                                --slide-end: -${_index === medias.length - 1 ? 0 : _index * 100 + 100}vh;
+                            `;
+                            return sliding(_index + 1);
+                        }, SLIDE_TIME
                     );
                 }
             }
         }
+        sliding(0);
     </script>
 </body>
 </html>
