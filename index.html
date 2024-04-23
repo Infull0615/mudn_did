@@ -1,16 +1,108 @@
-<html lang="ko" style="scrollbar-width: none;">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mudn</title>
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <link rel="manifest" href="./manifest/manifest.json">
+    <title>mudn_did</title>
+    <style>
+        body{
+            overflow: scroll;
+            scrollbar-width: none;
+            scroll-snap-type: y mandatory;
+            height: 100vh;
+            width: 100vw;
+            object-fit: contain;
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        img video {
+            scroll-snap-align: start;
+        }
+    </style>
 </head>
 <body>
-    <div id="ppt"style="position: relative; width: auto; height: 100vh;">
-        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQLEFDIGOWr-Ld5sIkRUfVTxlO-pEhRtZQM1gMuc_Q6jkaPZH05p4jrYlCBy20IcLSpJYFNhBQL0B-Q/embed?start=true&loop=true&delayms=10000" frameborder="0" width="100%" height="100%" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe> 
-    </div>
+    로딩중
+    <script>
+        window.addEventListener("click", (e) => {
+            if (!document.fullscreenElement)
+                document.documentElement.requestFullscreen();
+            else
+                document.exitFullscreen();
+        });
+
+        let medias = [];
+        let count = 0;
+        const load_medias = () => {
+            while(true){
+                let temp_ok = false;
+                count += 1;
+                fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp`)
+                    .then(
+                        (res) => {temp_ok = res.ok}
+                    );
+                if (temp_ok){
+                    medias.push({type: "img", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp`});
+                } else {
+                    fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4`)
+                    .then(
+                        (res) => {temp_ok = res.ok}
+                    );
+                }
+                if (temp_ok){
+                    medias.push({type: "video", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4`});
+                }
+
+                let inner_html = "";
+                count = 0;
+                medias.forEach((m) => {
+                    if (m.type === "img"){
+                        inner_html += `<img src=\"${m.link}\" />`;
+                    }else{
+                        count += 1;
+                        inner_html += `<video class=\"video${count}\" muted> <source src=\"${m.link}\" type=\'video/mp4\' /> </video>`;
+                    }
+                });
+            }
+        }
+        
+        let is_video = false;
+        let video_index = 0;
+        const sliding = (index) => {
+            if (medias.length === 0) setTimeout(sliding(0),1000);
+            else {
+                let body = document.body;
+                if (medias[index].type === "video"){
+                    video_index += 1;
+                    let video = document.querySelector(`.video${video_index}`).get(0);
+                    video.pause();
+                    video.currentTime = 0;
+                    video.play();
+                    const v_end = () => {
+                        if (video.prop("ended")){
+                            body.scrollTop += 100;
+                            if (body.offsetHeight + body.scrollTop >= body.scrollHeight){
+                                body.scrollTop = 0;
+                            }
+                            return sliding(index + 1);
+                        }else {
+                            return setTimeout(v_end(), 200);
+                        }
+                    }
+                    return v_end();
+                }
+                else {
+                    return setTimeout(
+                        () => {
+                            body.scrollTop += 100;
+                            if (body.offsetHeight + body.scrollTop >= body.scrollHeight){
+                                body.scrollTop = 0;
+                            }
+                            return sliding(index + 1);
+                        }, 1000
+                    );
+                }
+            }
+        }
+    </script>
 </body>
 </html>
