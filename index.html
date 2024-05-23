@@ -69,6 +69,7 @@
         }
         if (temp_ok) {
           medias.push({type: "video", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4`});
+          continue;
         } else {
           let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webm`);
           temp_ok = res.ok;
