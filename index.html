@@ -70,6 +70,11 @@
         if (temp_ok) {
           medias.push({type: "video", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4`});
         } else {
+          continue;
+        }
+        if (temp_ok) {
+          medias.push({type: "video", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webm`});
+        } else {
           break;
         }
       }
