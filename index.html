@@ -58,24 +58,24 @@
       while (true) {
         let temp_ok = false;
         count += 1;
-        let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp`);
+        let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp?${log_data}`);
         temp_ok = res.ok;
         if (res.ok) {
-          medias.push({type: "img", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp`});
+          medias.push({type: "img", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp?${log_data}`});
           continue;
         } else {
-          let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4`);
+          let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4?${log_data}`);
           temp_ok = res.ok;
         }
         if (temp_ok) {
-          medias.push({type: "video", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4`});
+          medias.push({type: "video/mp4", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4?${log_data}`});
           continue;
         } else {
-          let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webm`);
+          let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webm?${log_data}`);
           temp_ok = res.ok;
         }
         if (temp_ok) {
-          medias.push({type: "video", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webm`});
+          medias.push({type: "video/webm", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webm?${log_data}`});
         } else {
           break;
         }
@@ -85,9 +85,12 @@
       medias.forEach((m) => {
         if (m.type === "img") {
           inner_html += `<img src=\"${m.link}\" />`;
-        } else {
+        } else if(m.type === "video/mp4"){
           count += 1;
-          inner_html += `<video class=\"video${count}\" muted> <source src=\"${m.link}\"/> </video>`;
+          inner_html += `<video type=\"video/mp4\" class=\"video${count}\"  muted> <source src=\"${m.link}\"/> </video>`;
+        } else if(m.type === "video/webm"){
+          count += 1;
+          inner_html += `<video type=\"video/webm\" class=\"video${count}\"  muted> <source src=\"${m.link}\"/> </video>`;
         }
       });
       document.body.innerHTML = inner_html + "<div id=\"active\"></div>";
@@ -111,7 +114,7 @@
       if (medias.length === 0) setTimeout(() => sliding(0), 1000);
       else {
         let body = document.body;
-        if (medias[_index].type === "video") {
+        if (medias[_index].type.includes("video")) {
           video_index += 1;
           let video = document.querySelector(`.video${video_index}`);
           video.pause();
