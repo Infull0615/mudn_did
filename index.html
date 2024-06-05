@@ -58,24 +58,24 @@
       while (true) {
         let temp_ok = false;
         count += 1;
-        let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp?${log_data}`);
+        let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp?${is_update}`);
         temp_ok = res.ok;
         if (res.ok) {
-          medias.push({type: "img", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp?${log_data}`});
+          medias.push({type: "img", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webp?${is_update}`});
           continue;
         } else {
-          let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4?${log_data}`);
+          let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4?${is_update}`);
           temp_ok = res.ok;
         }
         if (temp_ok) {
-          medias.push({type: "video/mp4", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4?${log_data}`});
+          medias.push({type: "video/mp4", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.mp4?${is_update}`});
           continue;
         } else {
-          let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webm?${log_data}`);
+          let res = await fetch(`https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webm?${is_update}`);
           temp_ok = res.ok;
         }
         if (temp_ok) {
-          medias.push({type: "video/webm", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webm?${log_data}`});
+          medias.push({type: "video/webm", link: `https://raw.githubusercontent.com/Infull0615/mudn_did/main/media/slide${count}.webm?${is_update}`});
         } else {
           break;
         }
